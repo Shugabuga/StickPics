@@ -93,7 +93,7 @@ class CreateStickPicController: UIViewController {
     func getDocumentsDirectory() -> NSString {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         let documentsDirectory = paths[0]
-        return documentsDirectory
+        return documentsDirectory as NSString
     }
 
 
@@ -113,18 +113,21 @@ class CreateStickPicController: UIViewController {
             UIGraphicsBeginImageContext(imageView.frame.size)
             imageView.image?.draw(at: CGPoint.zero)
             
-            UIGraphicsGetCurrentContext()?.setLineCap(.round)
-            UIGraphicsGetCurrentContext()?.setLineWidth(brushSize)
-            UIGraphicsGetCurrentContext()?.setBlendMode(.clear)
+            let context = UIGraphicsGetCurrentContext()!
             
-            UIGraphicsGetCurrentContext()?.setStrokeColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-            UIGraphicsGetCurrentContext()?.beginPath()
+            context.setLineCap(.round)
+            context.setLineWidth(brushSize)
+            context.setBlendMode(.clear)
+            
+            context.setStrokeColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+            context.beginPath()
             
             if let lastPoint = lastPoint {
-                UIGraphicsGetCurrentContext()?.moveTo(x: lastPoint.x, y: lastPoint.y)
+                context.move(to: CGPoint(x: lastPoint.x, y: lastPoint.y))
             }
-            UIGraphicsGetCurrentContext()?.addLineTo(x: currentPoint.x, y: currentPoint.y)
-            UIGraphicsGetCurrentContext()?.strokePath()
+            context.addLine(to: CGPoint(x: currentPoint.x, y: currentPoint.y))
+
+            context.strokePath()
             imageView.image = UIGraphicsGetImageFromCurrentImageContext()
             
             UIGraphicsEndImageContext()
@@ -132,7 +135,6 @@ class CreateStickPicController: UIViewController {
             lastPoint = currentPoint
             
         case .ended:
-            
             hideUnderFingerView()
         default:
             break
@@ -145,20 +147,20 @@ class CreateStickPicController: UIViewController {
 
 extension CreateStickPicController {
     
-    private func hideUnderFingerView() {
+    public func hideUnderFingerView() {
         UIView.animate(withDuration: 0.5,delay: 0.0, options: UIViewAnimationOptions.beginFromCurrentState, animations: {
             self.leftUnderFingerView.alpha = 0.0
             }, completion: nil)
     }
     
     
-    private func showUnderFingerView() {
+    public func showUnderFingerView() {
         UIView.animate(withDuration: 0.5,delay: 0.0, options: UIViewAnimationOptions.beginFromCurrentState, animations: {
             self.leftUnderFingerView.alpha = 1.0
             }, completion: nil)
     }
     
-    private func setUnderFingerView(_ position: CGPoint) {
+    public func setUnderFingerView(_ position: CGPoint) {
         
         let underFingerSize: CGSize
         
